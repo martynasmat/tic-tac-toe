@@ -6,9 +6,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tic Tac Toe</title>
     <link rel="stylesheet" href="./styles/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     <script src="./scripts/script.js" defer></script>
 </head>
 <body>
-    
+    <header class="header">Tic Tac Toe</header>
+    <div class="main-content-wrapper">
+        <div class="player-one-container">
+            <div class="player-content-wrapper one">
+                <p class="player-one-text">Player 1</p>
+                <label for="player-one-name">Name</label>
+                <input type="text" id="player-one-name" placeholder="Player 1">
+                <button class="player-one-ready-button">READY</button>
+            </div>
+        </div>
+        <div class="board-wrapper">
+            
+        </div>
+        <button class="start-game-button">START</button>
+        <div class="player-two-container">
+             <div class="player-content-wrapper two">
+                <p class="player-two-text">Player 2</p>
+                <label for="player-two-name">Name</label>
+                <input type="text" id="player-two-name" placeholder="Player 1">
+                <button class="player-two-ready-button">READY</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
