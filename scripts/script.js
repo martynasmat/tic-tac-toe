@@ -1,5 +1,22 @@
 function gameBoard() {
-    let boardArray = [['1.1', '1.2', '1.3'], ['2.1', '2.2', '2.3'], ['3.1', '3.2', '3.3']];
+    let boardArray = [['', '', ''], ['', '', ''], ['', '', '']];
+    let turns = 1;
+
+
+    function checkAvailable(row, column) {
+        if(boardArray[row][column]) {
+            return false;
+        }else {
+            return true;
+        }
+    };
+
+    
+    function makeMove(row, column, marker) {
+        if(checkAvailable(row, column)) {
+            boardArray[row][column] = marker;
+        };
+    };
 
 
     function getBoard() {
@@ -7,17 +24,39 @@ function gameBoard() {
     };
 
 
+    function clearBoard() {
+        boardArray = [['', '', ''], ['', '', ''], ['', '', '']];
+    };
+
+    
+    function checkWin() {
+        // if no win condition is satisfied return 0
+        // if player 1 won return 1
+        // if player 2 won return 2
+        return 0;
+    };
+
+
     return {
         getBoard,
+        checkWin,
+        clearBoard,
+        turns,
     };
 };
 
 
-function player(element) {
+function player(element, marker) {
     let name = element.value;
     if(!name) {
         name = element.getAttribute("defaultValue");
     };
+
+
+    function getMarker() {
+        return marker;
+    };
+
 
     function getName() {
         return name;
@@ -26,20 +65,56 @@ function player(element) {
 
     return {
         getName,
+        getMarker,
     };
 };
 
 
 function displayController() {
+    const boardElement = document.querySelector(".board-wrapper");
+
+    function deleteBoardSquares() {
+        for(square of boardSquares) {
+            square.remove();
+        };
+    };
 
 
-    function refreshBoard(board) {
-        
+    function createBoardSquares(board) {
+        for(let i = 0; i < board.length; i++) {
+            const row = board[i];
+            for(let j = 0; j < row.length; j++) {
+                const cell = document.createElement("div");
+                cell.setAttribute("class", "square");
+                cell.setAttribute("id", `${i} ${j}`)
+                cell.textContent = row[j];
+                boardElement.appendChild(cell);
+            };
+        };
+    };
+
+
+    function updateBoardSquares(board) {
+        const boardSquares = document.querySelectorAll("square");
+        for(square of boardSquares) {
+            squarePos = square.getAttribute("id").split(" ");
+            squareRow = squarePos[0];
+            squareColumn = squarePos[1];
+            square.textContent = board[squareRow][squareColumn];
+        };
+    };
+
+
+    function getBoardSquares() {
+        return document.querySelectorAll("square");
     };
 
 
     return {
-        refreshBoard,
+        createBoardSquares,
+        updateBoardSquares,
+        deleteBoardSquares,
+        getBoardSquares,
     };
 };
 
@@ -81,15 +156,33 @@ function enablePlayerOptions() {
 };
 
 
-const gameStartBtn = document.querySelector(".start-game-button");
-gameStartBtn.addEventListener("click", (e) => {
+function game() {
     const gameBoardObj = gameBoard();
     const displayControllerObj = displayController();
-    const playerOneObj = player(document.querySelector("#player-one-name"));
-    const playerTwoObj = player(document.querySelector("#player-two-name")); 
-    // if a game is active, disable all buttons
+    const playerOneObj = player(document.querySelector("#player-one-name"), "X");
+    const playerTwoObj = player(document.querySelector("#player-two-name"), "O"); 
+    displayControllerObj.createBoardSquares(gameBoardObj.getBoard());
+    displayControllerObj.getBoardSquares().forEach((square) => {
+        square.addEventListener("click", (evt) => {
+            const squarePos = evt.target.getAttribute("id").split(" ");
+            console.log(squarePos);
+            if(gameBoardObj.turns % 2) {
+                gameBoardObj.makeMove(squarePos[0], squarePos[1], playerTwoObj.getMarker());
+            }else {
+                gameBoardObj.makeMove(squarePos[0], squarePos[1], playerOneObj.getMarker());
+            };
+            displayControllerObj.updateBoardSquares();
+        });
+    });
+}
+
+
+const gameStartBtn = document.querySelector(".start-game-button");
+gameStartBtn.addEventListener("click", (e) => {
+    // when the start button is clicked, disable all buttons and start game
     gameStartBtn.disabled = true;
     disablePlayerOptions();
+    game();
 });
 
 const readyButtons = document.querySelectorAll(".player-ready-button");
@@ -97,7 +190,7 @@ readyButtons.forEach((button) => {
     button.addEventListener("click", (evt) => {
         evt.target.classList.toggle("ready");
         evt.target.parentNode.parentNode.classList.toggle("container-ready");
-        // if both players are ready, disable the start button
+        // if both players are ready, enable the start button, else disable
         readyButtons.forEach(() => {
             if(checkReady(readyButtons)) {
                 gameStartBtn.disabled = false;

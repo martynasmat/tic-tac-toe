@@ -143,12 +143,32 @@ input {
 
 .board-wrapper {
     grid-area: 1 / 2 / 2 / 3;
-    height: 600px;
-    width: 600px;
+    height: 500px;
+    width: 500px;
     background-color: var(--color-game-bg);
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
+    gap: 30px;
+    padding: 30px;
+    transition: 2s;
+}
+
+.square {
+    border: 5px solid rgba(0, 0, 0, 0.103);
+    display: flex;
+    border-radius: 50%;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    font-size: 72px;
+    font-weight: 700;
+    transition: 0.3s;
+}
+
+.square:hover {
+    background-color: #3d484b31;
+    border-radius: 25px;
 }
 
 .start-game-button {
