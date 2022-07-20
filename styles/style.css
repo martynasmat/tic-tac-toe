@@ -49,6 +49,15 @@ body {
     height: 200px;
     width: 300px;
     padding: 20px;
+    transition: 0.3s;
+}
+
+.container-ready {
+    background-color: rgba(39, 170, 120, 0.562);
+}
+
+.container-ready > .player-content-wrapper > input {
+    background-color: rgba(39, 170, 120, 0.562);;
 }
 
 .player-container-one {
@@ -65,7 +74,8 @@ body {
     grid-template-columns: 1fr 5fr;
     grid-template-rows: 2fr 1fr 2fr;
     gap: 10px;
-    color: #364547
+    color: #364547;
+    transition: inherit;
 }
 
 .player-text {
@@ -89,6 +99,7 @@ input {
     border: none;
     background-color: var(--color5);
     color: var(--color4);
+    transition: inherit;
 }
 
 .player-ready-button {
@@ -98,11 +109,18 @@ input {
     justify-self: center;
 }
 
+.ready {
+    background-color: aqua;
+}
+
 .board-wrapper {
     grid-area: 1 / 2 / 2 / 3;
     height: 600px;
     width: 600px;
     background-color: var(--color3);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
 }
 
 .start-game-button {
