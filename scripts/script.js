@@ -41,7 +41,60 @@ function gameBoard() {
         // if no win condition is satisfied return 0
         // if player 1 won return 1
         // if player 2 won return 2
-        return 0;
+        let winningSquarePosArray = [[], [], []];
+        for(let i = 0; i < boardArray.length; i++) {
+            // check row
+            if(boardArray[i][i] === boardArray[i][i + 1] && boardArray[i][i + 1] === boardArray[i][i + 2]) {
+                winningSquarePosArray[0] = [i, i];
+                winningSquarePosArray[1] = [i, i + 1];
+                winningSquarePosArray[2] = [i, i + 2];
+                if(boardArray[i][i] === "X") {
+                    return [1, winningSquarePosArray];
+                }else if(boardArray[i][i] === "O"){
+                    return [2, winningSquarePosArray];
+                }else {
+                    return 0;
+                }
+            };
+            // check column
+            if(boardArray[0][i] === boardArray[1][i] && boardArray[1][i] === boardArray[2][i]) {
+                winningSquarePosArray[0] = [0, i];
+                winningSquarePosArray[1] = [1, i];
+                winningSquarePosArray[2] = [2, i];
+                if(boardArray[0][i] === "X") {
+                    return [1, winningSquarePosArray];
+                }else if(boardArray[0][i] === "O"){
+                    return [2, winningSquarePosArray];
+                }else {
+                    return 0;
+                };
+            };
+        };
+        if(boardArray[0][0] === boardArray[1][1] && boardArray[1][1] === boardArray[2][2]) {
+            winningSquarePosArray[0] = [0, 0];
+            winningSquarePosArray[1] = [1, 1];
+            winningSquarePosArray[2] = [2, 2];
+            if(boardArray[0][0] === "X") {
+                return [1, winningSquarePosArray];
+            }else if(boardArray[0][0] === "O"){
+                return [2, winningSquarePosArray];
+            }else {
+                return 0;
+            };
+        } else if(boardArray[0][2] === boardArray[1][1] && boardArray[1][1] === boardArray[2][0]) {
+            winningSquarePosArray[0] = [0, 2];
+            winningSquarePosArray[1] = [1, 1];
+            winningSquarePosArray[2] = [2, 0];
+            if(boardArray[0][2] === "X") {
+                return [1, winningSquarePosArray];
+            }else if(boardArray[0][2] === "O"){
+                return [2, winningSquarePosArray];
+            }else {
+                return 0;
+            };
+        } else {
+            return 0;
+        };
     };
 
 
@@ -180,21 +233,23 @@ function game() {
             const row = squarePos[0];
             const column = squarePos[1];
             let activePlayer = playerOneObj;
-            if(gameBoardObj.getTurns() % 2 == 0) {
+            if(gameBoardObj.getTurns() % 2 === 0) {
                 activePlayer = playerTwoObj;
             };
             if(gameBoardObj.checkAvailable(row, column)) {
-                gameBoardObj.makeMove(squarePos[0], squarePos[1], activePlayer.getMarker());
-            }
+                gameBoardObj.makeMove(row, column, activePlayer.getMarker());
+            };
             displayControllerObj.updateBoardSquares(gameBoardObj.getBoard());
             gameBoardObj.incrementTurns();
+            console.log(gameBoardObj.getBoard());
+            console.log(gameBoardObj.checkWin());
         });
     });
 }
 
 
 const gameStartBtn = document.querySelector(".start-game-button");
-gameStartBtn.addEventListener("click", (e) => {
+gameStartBtn.addEventListener("click", () => {
     // when the start button is clicked, disable all buttons and start game
     gameStartBtn.disabled = true;
     disablePlayerOptions();
