@@ -53,13 +53,42 @@ input:disabled {
 .main-content-wrapper {
     display: grid;
     grid-template-columns: 1fr 2fr 1fr;
-    grid-template-rows: 7fr 1fr;
+    grid-template-rows: 1fr;
     justify-items: center;
     padding: 30px;
     gap: 40px;
 }
 
+.final-text-wrapper {
+    grid-area: 1 / 2 / 2 / 3;
+    width: 80%;
+    height: min-content;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    align-self: start;
+}
+
+.final-text {
+    font-size: 20px;
+}
+
+.play-again-btn {
+    border-radius: 20px;
+    background-color: var(--color-input-bg);
+    border: 2px solid var(--color-game-chars);
+    color: var(--color-game-chars);
+    font-weight: 700;
+    transition: 0.3s;
+    font-size: 14px;
+    width: 120px;
+    height: 30px;
+}
+
+
 .player-container {
+    margin-top: 60px;
     border-radius: 20px;
     background-color: var(--color-game-bg);
     height: 200px;
@@ -143,6 +172,7 @@ input {
 }
 
 .board-wrapper {
+    margin-top: 60px;
     grid-area: 1 / 2 / 2 / 3;
     height: 500px;
     width: 500px;
@@ -179,11 +209,6 @@ input {
 
 .tie {
     background-color: grey;
-}
-
-.disappear {
-    opacity: 0;
-    transition: 3s;
 }
 
 .start-game-button {

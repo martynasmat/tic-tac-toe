@@ -50,6 +50,7 @@ function gameBoard() {
             display.addTieClass();
         };
         display.removeActiveClass();
+        setTimeout(display.addDisappearClass, 1000);
         display.displayFinalText(winner);
     };
 
@@ -148,23 +149,44 @@ function displayController() {
 
 
     function displayFinalText(winnerObj) {
-        if(!winnerObj.tie) {
-            
+        const finalTextWrapper = document.createElement("div");
+        finalTextWrapper.setAttribute("class", "final-text-wrapper");
+        const finalText = document.createElement("p");
+        finalText.setAttribute("class", "final-text");
+        const playAgainButton = document.createElement("button");
+        playAgainButton.setAttribute("class", "play-again-btn");
+        playAgainButton.textContent = "PLAY AGAIN";
+        playAgainButton.addEventListener("click", () => {
+            game();
+            deleteChildren();
+            deleteFinalText();
+            enablePlayerOptions();
+            document.querySelectorAll(".player-ready-button").forEach((button) => {
+                button.classList.toggle("ready");
+            });
+            document.querySelectorAll(".player-container").forEach((container) => {
+                container.classList.toggle("container-ready");
+            });
+            evt.target.parentNode.parentNode.classList.toggle("container-ready");
+        });
+        finalTextWrapper.appendChild(finalText);
+        finalTextWrapper.appendChild(playAgainButton);
+        if(winnerObj.tie) {
+            finalText.textContent = "It's a tie!"
         }else {
-
+            finalText.textContent = `${winnerObj.getName()} wins!`
         };
+        boardElement.parentElement.appendChild(finalTextWrapper);
     };
 
 
-    function addDisappearClass() {
-        getBoardSquares().forEach((square) => {
-            square.classList.add("disappear");
-        });
-    }
+    function deleteFinalText() {
+        const finalTextWrapper = document.querySelector(".final-text-wrapper");
+        finalTextWrapper.remove();
+    };
 
 
     function deleteChildren() {
-        console.log('kas daros nx');
         while(boardElement.hasChildNodes()) {
             boardElement.firstChild.remove();
         };
@@ -229,7 +251,6 @@ function displayController() {
         getBoardElement,
         addWinnerClass,
         addTieClass,
-        addDisappearClass,
         displayFinalText,
     };
 };
@@ -300,6 +321,7 @@ function game() {
     const displayControllerObj = displayController();
     const playerOneObj = player(document.querySelector("#player-one-name"), "X");
     const playerTwoObj = player(document.querySelector("#player-two-name"), "O"); 
+    displayControllerObj.deleteChildren();
     displayControllerObj.createBoardSquares(gameBoardObj.getBoard());
     displayControllerObj.getBoardSquares().forEach((square) => {
         square.addEventListener("click", squareEventHandler);
