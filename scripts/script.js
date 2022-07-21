@@ -50,7 +50,6 @@ function gameBoard() {
             display.addTieClass();
         };
         display.removeActiveClass();
-        display.removeEvtListener();
         display.displayFinalText(winner);
     };
 
@@ -148,15 +147,6 @@ function displayController() {
     };
 
 
-    function removeEvtListener() {
-        getBoardSquares().forEach((square) => {
-            square.removeEventListener("click", (evt) => {
-                squareEventHandler(evt, playerOneObj, playerTwoObj, gameBoardObj, displayControllerObj);
-            });
-        });
-    };
-
-
     function displayFinalText(winnerObj) {
         if(!winnerObj.tie) {
             
@@ -241,7 +231,6 @@ function displayController() {
         addTieClass,
         addDisappearClass,
         displayFinalText,
-        removeEvtListener,
     };
 };
 
@@ -313,10 +302,41 @@ function game() {
     const playerTwoObj = player(document.querySelector("#player-two-name"), "O"); 
     displayControllerObj.createBoardSquares(gameBoardObj.getBoard());
     displayControllerObj.getBoardSquares().forEach((square) => {
-        square.addEventListener("click", (evt) => {
-            squareEventHandler(evt, playerOneObj, playerTwoObj, gameBoardObj, displayControllerObj);
-        });
+        square.addEventListener("click", squareEventHandler);
     });
+
+
+    function squareEventHandler(evt) {
+        const squarePos = evt.target.getAttribute("id").split(" ");
+        const row = squarePos[0];
+        const column = squarePos[1];
+        let activePlayer = playerOneObj;
+        if(gameBoardObj.getTurns() % 2 === 0) {
+            activePlayer = playerTwoObj;
+        };
+        gameBoardObj.makeMove(row, column, activePlayer.getMarker());
+        displayControllerObj.updateBoardSquares(gameBoardObj.getBoard());
+        let winCheck = gameBoardObj.checkWin();
+        if(winCheck[0] === 1) {
+            removeEvtListener();
+            gameBoardObj.gameOver(displayControllerObj, winCheck[1], gameBoardObj.getTurns(), playerOneObj);
+        }else if(winCheck[0] === 2){
+            removeEvtListener();
+            gameBoardObj.gameOver(displayControllerObj, winCheck[1], gameBoardObj.getTurns(), playerTwoObj);
+        }else if(gameBoardObj.getTurns() === 10) {
+            const tieObj = player();
+            tieObj.tie = true;
+            removeEvtListener();
+            gameBoardObj.gameOver(displayControllerObj, winCheck[1], gameBoardObj.getTurns(), tieObj);
+        };
+    };
+
+    
+    function removeEvtListener() {
+        displayControllerObj.getBoardSquares().forEach((square) => {
+            square.removeEventListener("click", squareEventHandler);
+        });
+    };
 }
 
 
