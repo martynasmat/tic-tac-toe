@@ -46,7 +46,6 @@ function gameBoard() {
         if(!winner.tie) {
             display.addWinnerClass(winningSquareArray);
         }else {
-            console.log("TIE");
             display.addTieClass();
         };
         display.removeActiveClass();
@@ -114,9 +113,9 @@ function gameBoard() {
 
 
 function player(element, marker) {
-    let name = element.value;
-    if(!name) {
-        name = element.getAttribute("defaultValue");
+    let name = element.getAttribute("defaultValue");
+    if(element.value) {
+        name = element.value;
     };
 
 
@@ -167,7 +166,6 @@ function displayController() {
             document.querySelectorAll(".player-container").forEach((container) => {
                 container.classList.toggle("container-ready");
             });
-            evt.target.parentNode.parentNode.classList.toggle("container-ready");
         });
         finalTextWrapper.appendChild(finalText);
         finalTextWrapper.appendChild(playAgainButton);
@@ -293,29 +291,6 @@ function enablePlayerOptions() {
 };
 
 
-function squareEventHandler(evt, playerOneObj, playerTwoObj, gameBoardObj, displayControllerObj) {
-    const squarePos = evt.target.getAttribute("id").split(" ");
-    const row = squarePos[0];
-    const column = squarePos[1];
-    let activePlayer = playerOneObj;
-    if(gameBoardObj.getTurns() % 2 === 0) {
-        activePlayer = playerTwoObj;
-    };
-    gameBoardObj.makeMove(row, column, activePlayer.getMarker());
-    displayControllerObj.updateBoardSquares(gameBoardObj.getBoard());
-    let winCheck = gameBoardObj.checkWin();
-    if(winCheck[0] === 1) {
-        gameBoardObj.gameOver(displayControllerObj, winCheck[1], gameBoardObj.getTurns(), playerOneObj);
-    }else if(winCheck[0] === 2){
-        gameBoardObj.gameOver(displayControllerObj, winCheck[1], gameBoardObj.getTurns(), playerTwoObj);
-    }else if(gameBoardObj.getTurns() === 10) {
-        const tieObj = player();
-        tieObj.tie = true;
-        gameBoardObj.gameOver(displayControllerObj, winCheck[1], gameBoardObj.getTurns(), tieObj);
-    };
-};
-
-
 function game() {
     const gameBoardObj = gameBoard();
     const displayControllerObj = displayController();
@@ -346,7 +321,9 @@ function game() {
             removeEvtListener();
             gameBoardObj.gameOver(displayControllerObj, winCheck[1], gameBoardObj.getTurns(), playerTwoObj);
         }else if(gameBoardObj.getTurns() === 10) {
-            const tieObj = player();
+            let tieObj = document.createElement("null");
+            tieObj.setAttribute("defaultValue", null);
+            tieObj = player(tieObj);
             tieObj.tie = true;
             removeEvtListener();
             gameBoardObj.gameOver(displayControllerObj, winCheck[1], gameBoardObj.getTurns(), tieObj);
