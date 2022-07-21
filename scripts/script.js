@@ -40,7 +40,7 @@ function gameBoard() {
     };
 
 
-    function gameOver(display, winningSquareArray, turnCount) {
+    function gameOver(display, winningSquareArray, turnCount, winner) {
         const board = display.getBoardElement();
         board.classList.add("game-over");
         if(turnCount != 10) {
@@ -50,7 +50,8 @@ function gameBoard() {
             display.addTieClass();
         };
         display.removeActiveClass();
-        setTimeout(display.addDisappearClass, 1000);
+        display.removeEvtListener();
+        display.displayFinalText(winner);
     };
 
     
@@ -147,6 +148,24 @@ function displayController() {
     };
 
 
+    function removeEvtListener() {
+        getBoardSquares().forEach((square) => {
+            square.removeEventListener("click", (evt) => {
+                squareEventHandler(evt, playerOneObj, playerTwoObj, gameBoardObj, displayControllerObj);
+            });
+        });
+    };
+
+
+    function displayFinalText(winnerObj) {
+        if(!winnerObj.tie) {
+            
+        }else {
+
+        };
+    };
+
+
     function addDisappearClass() {
         getBoardSquares().forEach((square) => {
             square.classList.add("disappear");
@@ -154,9 +173,10 @@ function displayController() {
     }
 
 
-    function deleteBoardSquares() {
-        for(square of getBoardSquares()) {
-            square.remove();
+    function deleteChildren() {
+        console.log('kas daros nx');
+        while(boardElement.hasChildNodes()) {
+            boardElement.firstChild.remove();
         };
     };
 
@@ -213,13 +233,15 @@ function displayController() {
     return {
         createBoardSquares,
         updateBoardSquares,
-        deleteBoardSquares,
+        deleteChildren,
         getBoardSquares,
         removeActiveClass,
         getBoardElement,
         addWinnerClass,
         addTieClass,
         addDisappearClass,
+        displayFinalText,
+        removeEvtListener,
     };
 };
 
@@ -272,10 +294,14 @@ function squareEventHandler(evt, playerOneObj, playerTwoObj, gameBoardObj, displ
     gameBoardObj.makeMove(row, column, activePlayer.getMarker());
     displayControllerObj.updateBoardSquares(gameBoardObj.getBoard());
     let winCheck = gameBoardObj.checkWin();
-    if(winCheck[0]) {
-        gameBoardObj.gameOver(displayControllerObj, winCheck[1], gameBoardObj.getTurns());
+    if(winCheck[0] === 1) {
+        gameBoardObj.gameOver(displayControllerObj, winCheck[1], gameBoardObj.getTurns(), playerOneObj);
+    }else if(winCheck[0] === 2){
+        gameBoardObj.gameOver(displayControllerObj, winCheck[1], gameBoardObj.getTurns(), playerTwoObj);
     }else if(gameBoardObj.getTurns() === 10) {
-        gameBoardObj.gameOver(displayControllerObj, winCheck[1], gameBoardObj.getTurns());
+        const tieObj = player();
+        tieObj.tie = true;
+        gameBoardObj.gameOver(displayControllerObj, winCheck[1], gameBoardObj.getTurns(), tieObj);
     };
 };
 
