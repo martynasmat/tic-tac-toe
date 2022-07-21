@@ -13,7 +13,9 @@ function gameBoard() {
 
     
     function makeMove(row, column, marker) {
-        boardArray[row][column] = marker;
+        if(checkAvailable(row, column)) {
+            boardArray[row][column] = marker;
+        };
     };
 
 
@@ -36,65 +38,63 @@ function gameBoard() {
         return turns;
     };
 
+
+    function gameOver(display, winningSquareArray, turnCount) {
+        display.removeActiveClass();
+        const board = display.getBoardElement();
+        board.classList.add("game-over");
+        if(turnCount < 9) {
+            display.colorWinnerSquares(winningSquareArray);
+        }else {
+            display.getBoardSquares.forEach((square) => {
+                square.classList.add("winner");
+            });
+        };
+    };
+
     
     function checkWin() {
         // if no win condition is satisfied return 0
         // if player 1 won return 1
         // if player 2 won return 2
         let winningSquarePosArray = [[], [], []];
-        for(let i = 0; i < boardArray.length; i++) {
+        for(let i = 0; i < 3; i++) {
             // check row
-            if(boardArray[i][i] === boardArray[i][i + 1] && boardArray[i][i + 1] === boardArray[i][i + 2]) {
-                winningSquarePosArray[0] = [i, i];
-                winningSquarePosArray[1] = [i, i + 1];
-                winningSquarePosArray[2] = [i, i + 2];
-                if(boardArray[i][i] === "X") {
+            if(boardArray[i][0] === boardArray[i][1] && boardArray[i][1] === boardArray[i][2]) {
+                winningSquarePosArray = [[i, 0], [i, 1], [i, 2]];
+                if(boardArray[i][0] === "X") {
                     return [1, winningSquarePosArray];
-                }else if(boardArray[i][i] === "O"){
+                }else if(boardArray[i][0] === "O"){
                     return [2, winningSquarePosArray];
-                }else {
-                    return 0;
-                }
+                };
             };
             // check column
             if(boardArray[0][i] === boardArray[1][i] && boardArray[1][i] === boardArray[2][i]) {
-                winningSquarePosArray[0] = [0, i];
-                winningSquarePosArray[1] = [1, i];
-                winningSquarePosArray[2] = [2, i];
+                winningSquarePosArray = [[0, i], [1, i], [2, i]];
                 if(boardArray[0][i] === "X") {
                     return [1, winningSquarePosArray];
                 }else if(boardArray[0][i] === "O"){
                     return [2, winningSquarePosArray];
-                }else {
-                    return 0;
                 };
             };
         };
+        // check diagonals
         if(boardArray[0][0] === boardArray[1][1] && boardArray[1][1] === boardArray[2][2]) {
-            winningSquarePosArray[0] = [0, 0];
-            winningSquarePosArray[1] = [1, 1];
-            winningSquarePosArray[2] = [2, 2];
+            winningSquarePosArray = [[0, 0], [1, 1], [2, 2]];
             if(boardArray[0][0] === "X") {
                 return [1, winningSquarePosArray];
             }else if(boardArray[0][0] === "O"){
                 return [2, winningSquarePosArray];
-            }else {
-                return 0;
             };
         } else if(boardArray[0][2] === boardArray[1][1] && boardArray[1][1] === boardArray[2][0]) {
-            winningSquarePosArray[0] = [0, 2];
-            winningSquarePosArray[1] = [1, 1];
-            winningSquarePosArray[2] = [2, 0];
+            winningSquarePosArray = [[0, 2], [1, 1], [2, 0]];
             if(boardArray[0][2] === "X") {
                 return [1, winningSquarePosArray];
             }else if(boardArray[0][2] === "O"){
                 return [2, winningSquarePosArray];
-            }else {
-                return 0;
             };
-        } else {
-            return 0;
         };
+        return [0, []];
     };
 
 
@@ -106,6 +106,7 @@ function gameBoard() {
         checkAvailable,
         incrementTurns,
         getTurns,
+        gameOver,
     };
 };
 
@@ -145,12 +146,20 @@ function displayController() {
     };
 
 
+    function removeActiveClass() {
+        const boardSquares = document.querySelectorAll(".square");
+        for(square of boardSquares) {
+            square.classList.remove("active");
+        };
+    };
+
+
     function createBoardSquares(board) {
         for(let i = 0; i < board.length; i++) {
             const row = board[i];
             for(let j = 0; j < row.length; j++) {
                 const cell = document.createElement("div");
-                cell.setAttribute("class", "square");
+                cell.setAttribute("class", "square active");
                 cell.setAttribute("id", `${i} ${j}`)
                 cell.textContent = row[j];
                 boardElement.appendChild(cell);
@@ -170,8 +179,20 @@ function displayController() {
     };
 
 
+    function colorWinnerSquares(squareArray) {
+        for(let i = 0; i < 3; i++) {
+            document.getElementById(`${squareArray[i][0]} ${squareArray[i][1]}`).classList.add("winner");
+        };
+    };
+
+
+    function getBoardElement() {
+        return boardElement;
+    };
+
+
     function getBoardSquares() {
-        return document.querySelectorAll(".square");
+        return document.querySelectorAll(".square.active");
     };
 
 
@@ -180,6 +201,9 @@ function displayController() {
         updateBoardSquares,
         deleteBoardSquares,
         getBoardSquares,
+        removeActiveClass,
+        getBoardElement,
+        colorWinnerSquares,
     };
 };
 
@@ -236,13 +260,13 @@ function game() {
             if(gameBoardObj.getTurns() % 2 === 0) {
                 activePlayer = playerTwoObj;
             };
-            if(gameBoardObj.checkAvailable(row, column)) {
-                gameBoardObj.makeMove(row, column, activePlayer.getMarker());
-            };
+            gameBoardObj.makeMove(row, column, activePlayer.getMarker());
             displayControllerObj.updateBoardSquares(gameBoardObj.getBoard());
+            let winCheck = gameBoardObj.checkWin();
+            if(winCheck[0]) {
+                gameBoardObj.gameOver(displayControllerObj, winCheck[1], gameBoardObj.getTurns());
+            };
             gameBoardObj.incrementTurns();
-            console.log(gameBoardObj.getBoard());
-            console.log(gameBoardObj.checkWin());
         });
     });
 }

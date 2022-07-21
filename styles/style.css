@@ -124,7 +124,7 @@ input {
 
 .player-ready-button {
     grid-area: 4 / 1 / 5 / 3;
-    height: 30px;
+    height: 40px;
     width: 80px;
     border-radius: 20px;
     background-color: var(--color-input-bg);
@@ -166,9 +166,18 @@ input {
     transition: 0.3s;
 }
 
-.square:hover {
+.square.active:hover {
     background-color: #3d484b31;
     border-radius: 25px;
+    cursor: pointer;
+}
+
+.winner {
+    background-color: white;
+}
+
+.tie {
+    background-color: grey;
 }
 
 .start-game-button {
