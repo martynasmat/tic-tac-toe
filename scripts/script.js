@@ -4,7 +4,7 @@ function gameBoard() {
 
 
     function checkAvailable(row, column) {
-        if(boardArray[row][column]) {
+        if(boardArray[row][column] != '') {
             return false;
         }else {
             return true;
@@ -13,9 +13,7 @@ function gameBoard() {
 
     
     function makeMove(row, column, marker) {
-        if(checkAvailable(row, column)) {
-            boardArray[row][column] = marker;
-        };
+        boardArray[row][column] = marker;
     };
 
 
@@ -26,6 +24,16 @@ function gameBoard() {
 
     function clearBoard() {
         boardArray = [['', '', ''], ['', '', ''], ['', '', '']];
+    };
+
+
+    function incrementTurns() {
+        turns += 1;
+    };
+
+    
+    function getTurns() {
+        return turns;
     };
 
     
@@ -41,7 +49,10 @@ function gameBoard() {
         getBoard,
         checkWin,
         clearBoard,
-        turns,
+        makeMove,
+        checkAvailable,
+        incrementTurns,
+        getTurns,
     };
 };
 
@@ -74,6 +85,7 @@ function displayController() {
     const boardElement = document.querySelector(".board-wrapper");
 
     function deleteBoardSquares() {
+        const boardSquares = document.querySelectorAll(".square");
         for(square of boardSquares) {
             square.remove();
         };
@@ -95,18 +107,18 @@ function displayController() {
 
 
     function updateBoardSquares(board) {
-        const boardSquares = document.querySelectorAll("square");
-        for(square of boardSquares) {
+        const boardSquares = document.querySelectorAll(".square");
+        boardSquares.forEach((square) => {
             squarePos = square.getAttribute("id").split(" ");
             squareRow = squarePos[0];
             squareColumn = squarePos[1];
             square.textContent = board[squareRow][squareColumn];
-        };
+        });
     };
 
 
     function getBoardSquares() {
-        return document.querySelectorAll("square");
+        return document.querySelectorAll(".square");
     };
 
 
@@ -165,13 +177,17 @@ function game() {
     displayControllerObj.getBoardSquares().forEach((square) => {
         square.addEventListener("click", (evt) => {
             const squarePos = evt.target.getAttribute("id").split(" ");
-            console.log(squarePos);
-            if(gameBoardObj.turns % 2) {
-                gameBoardObj.makeMove(squarePos[0], squarePos[1], playerTwoObj.getMarker());
-            }else {
-                gameBoardObj.makeMove(squarePos[0], squarePos[1], playerOneObj.getMarker());
+            const row = squarePos[0];
+            const column = squarePos[1];
+            let activePlayer = playerOneObj;
+            if(gameBoardObj.getTurns() % 2 == 0) {
+                activePlayer = playerTwoObj;
             };
-            displayControllerObj.updateBoardSquares();
+            if(gameBoardObj.checkAvailable(row, column)) {
+                gameBoardObj.makeMove(squarePos[0], squarePos[1], activePlayer.getMarker());
+            }
+            displayControllerObj.updateBoardSquares(gameBoardObj.getBoard());
+            gameBoardObj.incrementTurns();
         });
     });
 }
