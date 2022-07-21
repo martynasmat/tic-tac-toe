@@ -15,6 +15,7 @@ function gameBoard() {
     function makeMove(row, column, marker) {
         if(checkAvailable(row, column)) {
             boardArray[row][column] = marker;
+            this.incrementTurns();
         };
     };
 
@@ -40,16 +41,16 @@ function gameBoard() {
 
 
     function gameOver(display, winningSquareArray, turnCount) {
-        display.removeActiveClass();
         const board = display.getBoardElement();
         board.classList.add("game-over");
-        if(turnCount < 9) {
-            display.colorWinnerSquares(winningSquareArray);
+        if(turnCount != 10) {
+            display.addWinnerClass(winningSquareArray);
         }else {
-            display.getBoardSquares.forEach((square) => {
-                square.classList.add("winner");
-            });
+            console.log("TIE");
+            display.addTieClass();
         };
+        display.removeActiveClass();
+        setTimeout(display.addDisappearClass, 1000);
     };
 
     
@@ -138,17 +139,30 @@ function player(element, marker) {
 function displayController() {
     const boardElement = document.querySelector(".board-wrapper");
 
+
+    function addTieClass() {
+        getBoardSquares().forEach((square) => {
+            square.classList.add("tie");
+        });
+    };
+
+
+    function addDisappearClass() {
+        getBoardSquares().forEach((square) => {
+            square.classList.add("disappear");
+        });
+    }
+
+
     function deleteBoardSquares() {
-        const boardSquares = document.querySelectorAll(".square");
-        for(square of boardSquares) {
+        for(square of getBoardSquares()) {
             square.remove();
         };
     };
 
 
     function removeActiveClass() {
-        const boardSquares = document.querySelectorAll(".square");
-        for(square of boardSquares) {
+        for(square of getBoardSquares()) {
             square.classList.remove("active");
         };
     };
@@ -179,7 +193,7 @@ function displayController() {
     };
 
 
-    function colorWinnerSquares(squareArray) {
+    function addWinnerClass(squareArray) {
         for(let i = 0; i < 3; i++) {
             document.getElementById(`${squareArray[i][0]} ${squareArray[i][1]}`).classList.add("winner");
         };
@@ -192,7 +206,7 @@ function displayController() {
 
 
     function getBoardSquares() {
-        return document.querySelectorAll(".square.active");
+        return document.querySelectorAll(".square");
     };
 
 
@@ -203,7 +217,9 @@ function displayController() {
         getBoardSquares,
         removeActiveClass,
         getBoardElement,
-        colorWinnerSquares,
+        addWinnerClass,
+        addTieClass,
+        addDisappearClass,
     };
 };
 
@@ -245,6 +261,25 @@ function enablePlayerOptions() {
 };
 
 
+function squareEventHandler(evt, playerOneObj, playerTwoObj, gameBoardObj, displayControllerObj) {
+    const squarePos = evt.target.getAttribute("id").split(" ");
+    const row = squarePos[0];
+    const column = squarePos[1];
+    let activePlayer = playerOneObj;
+    if(gameBoardObj.getTurns() % 2 === 0) {
+        activePlayer = playerTwoObj;
+    };
+    gameBoardObj.makeMove(row, column, activePlayer.getMarker());
+    displayControllerObj.updateBoardSquares(gameBoardObj.getBoard());
+    let winCheck = gameBoardObj.checkWin();
+    if(winCheck[0]) {
+        gameBoardObj.gameOver(displayControllerObj, winCheck[1], gameBoardObj.getTurns());
+    }else if(gameBoardObj.getTurns() === 10) {
+        gameBoardObj.gameOver(displayControllerObj, winCheck[1], gameBoardObj.getTurns());
+    };
+};
+
+
 function game() {
     const gameBoardObj = gameBoard();
     const displayControllerObj = displayController();
@@ -253,20 +288,7 @@ function game() {
     displayControllerObj.createBoardSquares(gameBoardObj.getBoard());
     displayControllerObj.getBoardSquares().forEach((square) => {
         square.addEventListener("click", (evt) => {
-            const squarePos = evt.target.getAttribute("id").split(" ");
-            const row = squarePos[0];
-            const column = squarePos[1];
-            let activePlayer = playerOneObj;
-            if(gameBoardObj.getTurns() % 2 === 0) {
-                activePlayer = playerTwoObj;
-            };
-            gameBoardObj.makeMove(row, column, activePlayer.getMarker());
-            displayControllerObj.updateBoardSquares(gameBoardObj.getBoard());
-            let winCheck = gameBoardObj.checkWin();
-            if(winCheck[0]) {
-                gameBoardObj.gameOver(displayControllerObj, winCheck[1], gameBoardObj.getTurns());
-            };
-            gameBoardObj.incrementTurns();
+            squareEventHandler(evt, playerOneObj, playerTwoObj, gameBoardObj, displayControllerObj);
         });
     });
 }

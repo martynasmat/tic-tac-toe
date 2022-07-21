@@ -133,6 +133,7 @@ input {
     color: var(--color-game-chars);
     font-weight: 700;
     transition: inherit;
+    font-size: 14px;
 }
 
 .ready {
@@ -178,6 +179,11 @@ input {
 
 .tie {
     background-color: grey;
+}
+
+.disappear {
+    opacity: 0;
+    transition: 3s;
 }
 
 .start-game-button {
