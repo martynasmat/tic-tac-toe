@@ -43,7 +43,7 @@ function gameBoard() {
     function gameOver(display, winningSquareArray, turnCount, winner) {
         const board = display.getBoardElement();
         board.classList.add("game-over");
-        if(turnCount != 10) {
+        if(!winner.tie) {
             display.addWinnerClass(winningSquareArray);
         }else {
             console.log("TIE");
